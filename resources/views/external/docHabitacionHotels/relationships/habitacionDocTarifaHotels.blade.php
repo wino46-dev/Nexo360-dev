@@ -1,0 +1,157 @@
+@can('doc_tarifa_hotel_create')
+    <div style="margin-bottom: 10px;" class="row">
+        <div class="col-lg-12">
+            <a class="btn btn-success" href="{{ route('external.doc-tarifa-hotels.create') }}">
+                {{ trans('global.add') }} {{ trans('cruds.docTarifaHotel.title_singular') }}
+            </a>
+        </div>
+    </div>
+@endcan
+
+<div class="card">
+    <div class="card-header">
+        {{ trans('cruds.docTarifaHotel.title_singular') }} {{ trans('global.list') }}
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class=" table table-bordered table-striped table-hover datatable datatable-habitacionDocTarifaHotels">
+                <thead>
+                    <tr>
+                        <th width="10">
+
+                        </th>
+                        <th>
+                            {{ trans('cruds.docTarifaHotel.fields.id') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.docTarifaHotel.fields.establecimiento') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.docTarifaHotel.fields.tarifa') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.docTarifaHotel.fields.regimen') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.docTarifaHotel.fields.habitacion') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.docTarifaHotel.fields.importe') }}
+                        </th>
+                        <th>
+                            {{ trans('cruds.docTarifaHotel.fields.fecha') }}
+                        </th>
+                        <th>
+                            &nbsp;
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($docTarifaHotels as $key => $docTarifaHotel)
+                        <tr data-entry-id="{{ $docTarifaHotel->id }}">
+                            <td>
+
+                            </td>
+                            <td>
+                                {{ $docTarifaHotel->id ?? '' }}
+                            </td>
+                            <td>
+                                {{ $docTarifaHotel->establecimiento->codigo ?? '' }}
+                            </td>
+                            <td>
+                                {{ $docTarifaHotel->tarifa ?? '' }}
+                            </td>
+                            <td>
+                                {{ App\Models\DocTarifaHotel::REGIMEN_SELECT[$docTarifaHotel->regimen] ?? '' }}
+                            </td>
+                            <td>
+                                {{ $docTarifaHotel->habitacion->nombre ?? '' }}
+                            </td>
+                            <td>
+                                {{ $docTarifaHotel->importe ?? '' }}
+                            </td>
+                            <td>
+                                {{ $docTarifaHotel->fecha ?? '' }}
+                            </td>
+                            <td>
+                                @can('doc_tarifa_hotel_show')
+                                    <a class="btn btn-xs btn-primary" href="{{ route('external.doc-tarifa-hotels.show', $docTarifaHotel->id) }}">
+                                        {{ trans('global.view') }}
+                                    </a>
+                                @endcan
+
+                                @can('doc_tarifa_hotel_edit')
+                                    <a class="btn btn-xs btn-info" href="{{ route('external.doc-tarifa-hotels.edit', $docTarifaHotel->id) }}">
+                                        {{ trans('global.edit') }}
+                                    </a>
+                                @endcan
+
+                                @can('doc_tarifa_hotel_delete')
+                                    <form action="{{ route('external.doc-tarifa-hotels.destroy', $docTarifaHotel->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
+                                    </form>
+                                @endcan
+
+                            </td>
+
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section('scripts')
+@parent
+<script>
+    $(function () {
+  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
+@can('doc_tarifa_hotel_delete')
+  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
+  let deleteButton = {
+    text: deleteButtonTrans,
+    url: "{{ route('external.doc-tarifa-hotels.massDestroy') }}",
+    className: 'btn-danger',
+    action: function (e, dt, node, config) {
+      var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {
+          return $(entry).data('entry-id')
+      });
+
+      if (ids.length === 0) {
+        alert('{{ trans('global.datatables.zero_selected') }}')
+
+        return
+      }
+
+      if (confirm('{{ trans('global.areYouSure') }}')) {
+        $.ajax({
+          headers: {'x-csrf-token': _token},
+          method: 'POST',
+          url: config.url,
+          data: { ids: ids, _method: 'DELETE' }})
+          .done(function () { location.reload() })
+      }
+    }
+  }
+  dtButtons.push(deleteButton)
+@endcan
+
+  $.extend(true, $.fn.dataTable.defaults, {
+    orderCellsTop: true,
+    order: [[ 3, 'asc' ]],
+    pageLength: 25,
+  });
+  let table = $('.datatable-habitacionDocTarifaHotels:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+  $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
+      $($.fn.dataTable.tables(true)).DataTable()
+          .columns.adjust();
+  });
+
+})
+
+</script>
+@endsection

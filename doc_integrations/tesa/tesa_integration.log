@@ -1,0 +1,8 @@
+2025-12-22 11:01:04,606 - INFO - CSRF token obtenido: eyJpdiI6IkZhY01kcWhYUTZZTDZJNTgvamZ0ZGc9PSIsInZhbHVlIjoiZnh2Vkd0SThJcncvK1RTanRaaXVNOTA1SHF6aStTaEQ3V0h3RWtldTAwejR5QWQwTmtMSXJBRHk5VUNSQmxablJFRzhVQmlhMmMzRTNJalduaytwMDRVV0pFVnV5S05JU0x4YlRIMW5VRFhtK3hjUWFnejNEazJHbUh5NE84enIiLCJtYWMiOiJhOGU1NTgzZWY1OGJhZjllOTlkODdjZDIxNTQ2NmZhYWYyNWNlNjNjYTg1NzM0Y2E0YmZlZjk3ODg1MmEzOTc3IiwidGFnIjoiIn0%3D
+2025-12-22 11:01:04,960 - INFO - Login exitoso en la API REST.
+2025-12-22 11:01:05,363 - INFO - Perfil del tótem obtenido con éxito.
+2025-12-22 11:01:05,365 - INFO - Totem id: 94
+2025-12-22 11:01:05,368 - INFO - Configurador grabador: [{'id': 36, 'software_gestion': 'tesa', 'reader_no': 0, 'track_2': 'null', 'seq_mode': '0', 'show_message': '0', 'user_host': '10.253.99.234', 'created_at': '2025-03-28 09:10:23', 'updated_at': '2025-11-04 14:19:54', 'deleted_at': None, 'totem_id': 42, 'team_id': None, 'user_port': 443, 'json_grabador': '{\r\n"soap_wsdl": "https://10.253.99.234:8181/ServerPlatform/GuestsWebService?wsdl",\r\n  "operator_name": "director",\r\n  "operator_password": "123456"\r\n}'}]
+2025-12-22 11:01:05,373 - INFO - Configuración SOAP y Pusher cargadas desde el perfil del tótem.
+2025-12-22 11:01:26,763 - INFO - Error reportado con éxito al endpoint de control.
+2025-12-22 11:01:26,764 - ERROR - Error en la inicialización: HTTPSConnectionPool(host='10.253.99.234', port=8181): Max retries exceeded with url: /ServerPlatform/GuestsWebService?wsdl (Caused by ConnectTimeoutError(<urllib3.connection.HTTPSConnection object at 0x0000012FA41BF920>, 'Connection to 10.253.99.234 timed out. (connect timeout=300)'))

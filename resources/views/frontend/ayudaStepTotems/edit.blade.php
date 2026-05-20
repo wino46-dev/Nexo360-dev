@@ -1,0 +1,169 @@
+@extends('layouts.frontend')
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+
+            <div class="card">
+                <div class="card-header">
+                    {{ trans('global.edit') }} {{ trans('cruds.ayudaStepTotem.title_singular') }}
+                </div>
+
+                <div class="card-body">
+                    <form method="POST" action="{{ route("frontend.ayuda-step-totems.update", [$ayudaStepTotem->id]) }}" enctype="multipart/form-data">
+                        @method('PUT')
+                        @csrf
+                        <div class="form-group">
+                            <label class="required" for="establecimiento_id">{{ trans('cruds.ayudaStepTotem.fields.establecimiento') }}</label>
+                            <select class="form-control select2" name="establecimiento_id" id="establecimiento_id" required>
+                                @foreach($establecimientos as $id => $entry)
+                                    <option value="{{ $id }}" {{ (old('establecimiento_id') ? old('establecimiento_id') : $ayudaStepTotem->establecimiento->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('establecimiento'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('establecimiento') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.ayudaStepTotem.fields.establecimiento_helper') }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventos_push">{{ trans('cruds.ayudaStepTotem.fields.eventos_push') }}</label>
+                            <textarea class="form-control ckeditor" name="eventos_push" id="eventos_push">{!! old('eventos_push', $ayudaStepTotem->eventos_push) !!}</textarea>
+                            @if($errors->has('eventos_push'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('eventos_push') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.ayudaStepTotem.fields.eventos_push_helper') }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="pase_imagenes">{{ trans('cruds.ayudaStepTotem.fields.pase_imagenes') }}</label>
+                            <textarea class="form-control ckeditor" name="pase_imagenes" id="pase_imagenes">{!! old('pase_imagenes', $ayudaStepTotem->pase_imagenes) !!}</textarea>
+                            @if($errors->has('pase_imagenes'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('pase_imagenes') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.ayudaStepTotem.fields.pase_imagenes_helper') }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="captura_documentos">{{ trans('cruds.ayudaStepTotem.fields.captura_documentos') }}</label>
+                            <textarea class="form-control ckeditor" name="captura_documentos" id="captura_documentos">{!! old('captura_documentos', $ayudaStepTotem->captura_documentos) !!}</textarea>
+                            @if($errors->has('captura_documentos'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('captura_documentos') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.ayudaStepTotem.fields.captura_documentos_helper') }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="pago_reserva">{{ trans('cruds.ayudaStepTotem.fields.pago_reserva') }}</label>
+                            <textarea class="form-control ckeditor" name="pago_reserva" id="pago_reserva">{!! old('pago_reserva', $ayudaStepTotem->pago_reserva) !!}</textarea>
+                            @if($errors->has('pago_reserva'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('pago_reserva') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.ayudaStepTotem.fields.pago_reserva_helper') }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="grabacion_tarjeta">{{ trans('cruds.ayudaStepTotem.fields.grabacion_tarjeta') }}</label>
+                            <textarea class="form-control ckeditor" name="grabacion_tarjeta" id="grabacion_tarjeta">{!! old('grabacion_tarjeta', $ayudaStepTotem->grabacion_tarjeta) !!}</textarea>
+                            @if($errors->has('grabacion_tarjeta'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('grabacion_tarjeta') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.ayudaStepTotem.fields.grabacion_tarjeta_helper') }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="parte_viajero">{{ trans('cruds.ayudaStepTotem.fields.parte_viajero') }}</label>
+                            <textarea class="form-control ckeditor" name="parte_viajero" id="parte_viajero">{!! old('parte_viajero', $ayudaStepTotem->parte_viajero) !!}</textarea>
+                            @if($errors->has('parte_viajero'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('parte_viajero') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.ayudaStepTotem.fields.parte_viajero_helper') }}</span>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-danger" type="submit">
+                                {{ trans('global.save') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
+    $(document).ready(function () {
+  function SimpleUploadAdapter(editor) {
+    editor.plugins.get('FileRepository').createUploadAdapter = function(loader) {
+      return {
+        upload: function() {
+          return loader.file
+            .then(function (file) {
+              return new Promise(function(resolve, reject) {
+                // Init request
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '{{ route('frontend.ayuda-step-totems.storeCKEditorImages') }}', true);
+                xhr.setRequestHeader('x-csrf-token', window._token);
+                xhr.setRequestHeader('Accept', 'application/json');
+                xhr.responseType = 'json';
+
+                // Init listeners
+                var genericErrorText = `Couldn't upload file: ${ file.name }.`;
+                xhr.addEventListener('error', function() { reject(genericErrorText) });
+                xhr.addEventListener('abort', function() { reject() });
+                xhr.addEventListener('load', function() {
+                  var response = xhr.response;
+
+                  if (!response || xhr.status !== 201) {
+                    return reject(response && response.message ? `${genericErrorText}\n${xhr.status} ${response.message}` : `${genericErrorText}\n ${xhr.status} ${xhr.statusText}`);
+                  }
+
+                  $('form').append('<input type="hidden" name="ck-media[]" value="' + response.id + '">');
+
+                  resolve({ default: response.url });
+                });
+
+                if (xhr.upload) {
+                  xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                      loader.uploadTotal = e.total;
+                      loader.uploaded = e.loaded;
+                    }
+                  });
+                }
+
+                // Send request
+                var data = new FormData();
+                data.append('upload', file);
+                data.append('crud_id', '{{ $ayudaStepTotem->id ?? 0 }}');
+                xhr.send(data);
+              });
+            })
+        }
+      };
+    }
+  }
+
+  var allEditors = document.querySelectorAll('.ckeditor');
+  for (var i = 0; i < allEditors.length; ++i) {
+    ClassicEditor.create(
+      allEditors[i], {
+        extraPlugins: [SimpleUploadAdapter]
+      }
+    );
+  }
+});
+</script>
+
+@endsection

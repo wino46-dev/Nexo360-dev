@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\EventoHomeTotem;
+use Gate;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Response;
+
+class UpdateEventoHomeTotemRequest extends FormRequest
+{
+
+
+    public function authorize()
+    {
+        return Gate::allows('evento_home_totem_edit');
+    }
+
+    public function rules()
+    {
+        return [
+
+        ];
+    }
+}

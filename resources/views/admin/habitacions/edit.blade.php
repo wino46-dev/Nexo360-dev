@@ -1,0 +1,48 @@
+@extends('layouts.admin')
+@section('content')
+
+<div class="card">
+    <div class="card-header">
+        {{ trans('global.edit') }} {{ trans('cruds.habitacion.title_singular') }}
+    </div>
+
+    <div class="card-body">
+        <form method="POST" action="{{ route("admin.habitacions.update", [$habitacion->id]) }}" enctype="multipart/form-data">
+            @method('PUT')
+            @csrf
+            <div class="form-group">
+                <label class="required" for="establecimiento_id">{{ trans('cruds.habitacion.fields.establecimiento') }}</label>
+                <select class="form-control select2 {{ $errors->has('establecimiento') ? 'is-invalid' : '' }}" name="establecimiento_id" id="establecimiento_id" required>
+                    @foreach($establecimientos as $id => $entry)
+                        <option value="{{ $id }}" {{ (old('establecimiento_id') ? old('establecimiento_id') : $habitacion->establecimiento->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('establecimiento'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('establecimiento') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.habitacion.fields.establecimiento_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label class="required" for="codigo">{{ trans('cruds.habitacion.fields.codigo') }}</label>
+                <input class="form-control {{ $errors->has('codigo') ? 'is-invalid' : '' }}" type="text" name="codigo" id="codigo" value="{{ old('codigo', $habitacion->codigo) }}" required>
+                @if($errors->has('codigo'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('codigo') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.habitacion.fields.codigo_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-danger" type="submit">
+                    {{ trans('global.save') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@endsection
