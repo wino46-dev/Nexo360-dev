@@ -1,55 +1,31 @@
-<?php
+     <!DOCTYPE html>
+     <head>
+      <title>¡Hola mundo!</title>
+     </head>
 
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Http\Request;
+     <body>
+      <h1>¡Hola mundo!</h1>
+      <p><?php echo 'Estamos corriendo PHP, version: ' . phpversion(); ?></p>
+      <?
+       $database ="mydb";
+       $user = "myuser";
+       $password = "password";
+       $host = "mysql";
 
-define('LARAVEL_START', microtime(true));
+       $connection = new PDO("mysql:host={$host};dbname={$database};charset=utf8", $user, $password);
+       $query = $connection->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_TYPE='BASE TABLE'");
+       $tables = $query->fetchAll(PDO::FETCH_COLUMN);
 
-/*
-|--------------------------------------------------------------------------
-| Check If The Application Is Under Maintenance
-|--------------------------------------------------------------------------
-|
-| If the application is in maintenance / demo mode via the "down" command
-| we will load this file so that any pre-rendered content can be shown
-| instead of starting the framework, which could cause an exception.
-|
-*/
-
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
-}
-
-/*
-|--------------------------------------------------------------------------
-| Register The Auto Loader
-|--------------------------------------------------------------------------
-|
-| Composer provides a convenient, automatically generated class loader for
-| this application. We just need to utilize it! We'll simply require it
-| into the script here so we don't need to manually load our classes.
-|
-*/
-
-require __DIR__.'/../vendor/autoload.php';
-
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-|
-| Once we have the application, we can handle the incoming request using
-| the application's HTTP kernel. Then, we will send the response back
-| to this client's browser, allowing them to enjoy our application.
-|
-*/
-
-$app = require_once __DIR__.'/../bootstrap/app.php';
-
-$kernel = $app->make(Kernel::class);
-
-$response = $kernel->handle(
-    $request = Request::capture()
-)->send();
-
-$kernel->terminate($request, $response);
+        if (empty($tables)) {
+          echo "<p>No hay tablas en la base de datos \"{$database}\".</p>";
+        } else {
+          echo "<p>La base de datos \"{$database}\" tiene las siguientes tablas:</p>";
+          echo "<ul>";
+            foreach ($tables as $table) {
+              echo "<li>{$table}</li>";
+            }
+          echo "</ul>";
+        }
+        ?>
+    </body>
+</html>
