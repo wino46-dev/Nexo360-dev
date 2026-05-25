@@ -16,6 +16,16 @@ services:
       - ./:/var/www    
     networks:
       - sh360-red
+
+  phpweb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sh360-phpweb
+    volumes:
+      - ./public:/var/www/html
+    networks:
+      - sh360-red
   
   nginx:
     image: nginx:alpine
@@ -30,6 +40,7 @@ services:
     networks:
       - sh360-red
 
+   
 networks:
   sh360-red:
     driver: bridge

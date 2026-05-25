@@ -50,3 +50,20 @@ RUN chown -R www-data:www-data /var/www
 
 # Set working directory
 WORKDIR /var/www
+
+RUN docker-php-ext-install mysqli pdo_mysql
+
+# Instala extensiones necesarias
+RUN docker-php-ext-install pdo pdo_mysql mysqli
+
+# Cambiar Apache para escuchar en el puerto 81
+RUN sed -i 's/80/81/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
+
+# Habilita mod_rewrite si lo necesitas
+RUN a2enmod rewrite
+
+# Asegura que el contenedor tenga permisos correctos
+RUN chown -R www-data:www-data /var/www/html
+
+# Copia inicial del código (será sobrescrito por volumen)
+COPY ./public /var/www/html
