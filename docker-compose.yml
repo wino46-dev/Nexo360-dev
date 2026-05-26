@@ -1,12 +1,35 @@
 services:
+  mariadb:
+    image: docker.io/bitnami/mariadb@sha256:080f43016353de960fbdc733f7f149fae8316382af4c479a4a8adab369861909
+    environment:
+      MARIADB_USER: "myuser"
+      MARIADB_PASSWORD: "password"
+      MARIADB_DATABASE: "mydb"
+      MARIADB_ROOT_PASSWORD: "secret"
+    networks:
+      - sh360-red
+
   app:
-    build:      
+    build:
       args:
         user: sammy
         uid: 1000
       context: ./
-      dockerfile: Dockerfile    
+      dockerfile: Dockerfile
     image: sh360-app
+    expose:
+      - 9000
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: mydb
+      DB_USERNAME: myuser
+      DB_PASSWORD: password
+    depends_on:
+      - mariadb
+    command: >
+      sh -lc "mkdir -p /var/www/storage/logs /var/www/bootstrap/cache && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && chmod -R ug+rwX /var/www/storage /var/www/bootstrap/cache && exec php-fpm -F"
     tty: true
     container_name: sh360-app
     restart: always
@@ -29,37 +52,6 @@ services:
     networks:
       - sh360-red
 
-  php:
-    image: php:7.0-fpm
-    container_name: php-container
-    expose:
-      - 9000
-    volumes:
-      - ./www/html/:/var/www/html/
-    networks:
-      - sh360-red
-
-  mysql:
-    image: mysql:5.7
-    container_name: mysql-container
-    volumes_from:
-      - mysql-data
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: mydb
-      MYSQL_USER: myuser
-      MYSQL_PASSWORD: password
-    networks:
-      - sh360-red
-
-  mysql-data:
-    image: mysql:5.7
-    container_name: mysql-data-container
-    volumes:
-      - /var/lib/mysql
-    command: "true"
-
-   
 networks:
   sh360-red:
     driver: bridge

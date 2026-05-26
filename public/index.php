@@ -1,31 +1,20 @@
-     <!DOCTYPE html>
-     <head>
-      <title>¡Hola mundo!</title>
-     </head>
+<?php
 
-     <body>
-      <h1>¡Hola mundo!</h1>
-      <p><?php echo 'Estamos corriendo PHP, version: ' . phpversion(); ?></p>
-      <?
-       $database ="mydb";
-       $user = "myuser";
-       $password = "password";
-       $host = "mysql";
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
-       $connection = new PDO("mysql:host={$host};dbname={$database};charset=utf8", $user, $password);
-       $query = $connection->query("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_TYPE='BASE TABLE'");
-       $tables = $query->fetchAll(PDO::FETCH_COLUMN);
+define('LARAVEL_START', microtime(true));
 
-        if (empty($tables)) {
-          echo "<p>No hay tablas en la base de datos \"{$database}\".</p>";
-        } else {
-          echo "<p>La base de datos \"{$database}\" tiene las siguientes tablas:</p>";
-          echo "<ul>";
-            foreach ($tables as $table) {
-              echo "<li>{$table}</li>";
-            }
-          echo "</ul>";
-        }
-        ?>
-    </body>
-</html>
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// Register the Composer autoloader...
+require __DIR__.'/../vendor/autoload.php';
+
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$app->handleRequest(Request::capture());

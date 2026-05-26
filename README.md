@@ -23,31 +23,24 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
 ## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
+- **[Vehikl](https://vehikl.com)**
 - **[Tighten Co.](https://tighten.co)**
 - **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
 - **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 
@@ -64,61 +57,3 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-# SH-360
-
-Este proyecto es una aplicación Laravel con integración en tiempo real (Pusher) y telefonía SIP vía WebRTC/Janus para comunicación con 3CX.
-
-## Flujo de Llamadas (3CX / Llamada Inversa)
-
-Resumen de cómo funciona la llamada (normal e inversa) entre el Agente (Backoffice) y el Tótem (Frontend):
-
-- Frontend (Tótem): recursos en `resources/views/frontend/home/`
-  - scripts.blade.php: suscribe a canal Pusher `alda_events` y escucha el evento `TotemHomeEvent`.
-  - page_llamada.blade.php: muestra la página de llamada e invoca funciones JS para iniciar la llamada.
-  - vue/callVue.blade.php: instancia Vue y expone `miVueApp` con métodos `llamada_iniciar`, `llamada_inversa_iniciar`, `llamada_colgar`.
-  - vue/Phone.blade.php y vue/PhoneCommander.blade.php: implementación del softphone sobre WebRTC utilizando Janus SIP plugin. Se conecta a un gateway WebRTC (wss Janus) y realiza/recibe llamadas SIP hacia/desde 3CX usando las credenciales SIP del usuario/caller (`$caller`).
-
-- Backend (Agente): rutas en `routes/web.php` y controlador `app/Http/Controllers/Admin/CallManagerController.php`.
-  - Ruta POST `admin/call-manager/llamada-inversa` -> método `llamadaInversa`.
-  - `llamadaInversa` valida que el usuario emisor tenga `sip_identity` y que exista una `ControlSesion` activa (emisor=receptor totem). Si todo está correcto, emite el evento de broadcast `SendTotemHomeEvent` con:
-    - `tipo_evento_id: 'reverse_call'`
-    - `receptor_id`: usuario del tótem
-    - `emisor_id`: agente
-    - `mensaje`: `sip_identity` del agente (destino de la llamada)
-
-- Tiempo real (Broadcasting):
-  - Evento `App\Events\SendTotemHomeEvent` se emite en el canal público `alda_events` con alias `TotemHomeEvent`.
-  - El tótem escucha el evento y, cuando recibe `tipo_evento_id = 'reverse_call'`, ejecuta:
-    - `openCamera()` y `llamada_inversa(mensaje)` donde `mensaje` es el SIP Identity de destino.
-    - `llamada_inversa` llama a `miVueApp.llamada_inversa_iniciar(sipIdentityDestino)` que a su vez invoca `llamar_inversa()` del componente Vue `neo-call`, terminando en `window.instanciaPhone.doCall('sip:' + sipIdentityDestino)` a través de Janus SIP.
-
-- Servidor WebRTC/SIP:
-  - PhoneCommander usa Janus (`/js/janus.js`) con `window.config.webrtcServer = wss://gateway.norvoz.es:8989` para exponer un endpoint WebRTC que habla SIP con 3CX.
-  - Las credenciales SIP (identity, registrar, username, password, destinos) se inyectan desde backend en `vue/Phone.blade.php` vía `$caller`.
-
-### Llamada normal vs Llamada inversa
-
-Nota 3CX v20: Para llamadas que pasan por COLA, 3CX requiere que el endpoint OFREZCA VIDEO en el INVITE inicial para permitir videorrenegociación. Se ha actualizado el softphone WebRTC para incluir pista de video en el SDP inicial (m=video) en llamadas salientes del Tótem, tanto directas como de llamada inversa.
-- Llamada normal (desde Tótem):
-  - page_llamada -> `page11_llamar()` -> `miVueApp.llamada_iniciar()` -> `neo-call.llamar()` -> `doCall(this.sipIdentityDestino)` hacia el destino preconfigurado.
-- Llamada inversa (iniciada desde Backoffice/Agente):
-  - Backoffice click botón -> AJAX POST a `admin/call-manager/llamada-inversa`.
-  - Backend emite evento `reverse_call` con SIP del agente.
-  - Tótem recibe evento y ejecuta `llamada_inversa(sipIdentityAgente)` -> `doCall('sip:' + sipIdentityAgente)`.
-
-### Archivos Clave
-- Rutas: `routes/web.php` (sección call-manager)
-- Controlador: `app/Http/Controllers/Admin/CallManagerController.php` (método `llamadaInversa`)
-- Evento: `app/Events/SendTotemHomeEvent.php`
-- Frontend receptor (Pusher): `resources/views/frontend/home/scripts.blade.php`
-- Frontend llamada WebRTC/SIP: `resources/views/frontend/home/vue/Phone*.blade.php`
-
-### Respuestas de API
-- `POST admin/call-manager/llamada-inversa`
-  - Respuesta success: `{ status: 'ok', message: 'Llamada inversa solicitada correctamente.' }`
-  - Errores posibles (HTTP 200):
-    - `{ status: 'error', message: 'No está definido el SIP Identity para el usuario.' }`
-    - `{ status: 'error', message: 'No hay una sesión activa con un tótem asignado.' }`
-
-Este flujo permite que el agente fuerce una llamada hacia el tótem utilizando la identidad SIP del agente en 3CX, transportada por WebRTC a través de Janus.
