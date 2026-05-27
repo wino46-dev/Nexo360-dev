@@ -1,9 +1,17 @@
 <?php
 
 use App\Http\Controllers\WebhookController;
+use Illuminate\Support\Facades\Route;
 
-Route::post('login', 'Api\\AuthController@login');
-Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
+Route::post('login', 'App\\Http\\Controllers\\Api\\AuthController@login');
+Route::get('ping', function () {
+    return response()->json([
+        'ok' => true,
+        'message' => 'API reachable',
+    ]);
+});
+
+Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
     // Users
     Route::apiResource('users', 'UsersApiController');
     // Establecimiento
@@ -151,7 +159,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
 
 });
 
-Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], function () {
+Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin'], function () {
     Route::post('reservation', 'ReservationController@store');
 });
 
@@ -187,7 +195,7 @@ Route::prefix('v1/local-pms/{hotel_code}')
         Route::post('payments/refunds', [\App\Http\Controllers\Api\LocalPms\PaymentsController::class, 'refund']);
     });
 
-/*Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], function () {
+/*Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'App\Http\Controllers\Api\V1\Admin'], function () {
     // Respuesta Pago
     Route::apiResource('respuesta-pagos', 'RespuestaPagoApiController');
 });*/
