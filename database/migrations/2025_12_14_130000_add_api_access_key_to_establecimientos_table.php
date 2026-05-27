@@ -9,7 +9,11 @@ return new class extends Migration {
     {
         Schema::table('establecimientos', function (Blueprint $table) {
             if (!Schema::hasColumn('establecimientos', 'api_access_key')) {
-                $table->string('api_access_key', 128)->nullable()->after('misterplan_channel_id');
+                $afterColumn = Schema::hasColumn('establecimientos', 'misterplan_channel_id')
+                    ? 'misterplan_channel_id'
+                    : (Schema::hasColumn('establecimientos', 'misterplan_api_key') ? 'misterplan_api_key' : 'nombre');
+
+                $table->string('api_access_key', 128)->nullable()->after($afterColumn);
                 $table->index('api_access_key', 'establecimientos_api_access_key_idx');
             }
         });

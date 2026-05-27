@@ -10,11 +10,13 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             if (!Schema::hasColumn('users', 'type')) {
+                $afterColumn = Schema::hasColumn('users', 'pms_password') ? 'pms_password' : 'password';
+
                 // Use enum if supported; fallback to string with check handled at app level
                 if (Schema::getConnection()->getDriverName() === 'mysql') {
-                    $table->enum('type', ['internal','external','totem'])->default('internal')->after('pms_password');
+                    $table->enum('type', ['internal','external','totem'])->default('internal')->after($afterColumn);
                 } else {
-                    $table->string('type')->default('internal')->after('pms_password');
+                    $table->string('type')->default('internal')->after($afterColumn);
                 }
             }
         });

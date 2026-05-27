@@ -9,10 +9,18 @@ return new class extends Migration {
     {
         Schema::table('establecimientos', function (Blueprint $table) {
             if (!Schema::hasColumn('establecimientos', 'misterplan_api_key')) {
-                $table->string('misterplan_api_key')->nullable()->after('api_pms_password');
+                $afterColumn = Schema::hasColumn('establecimientos', 'api_pms_password')
+                    ? 'api_pms_password'
+                    : (Schema::hasColumn('establecimientos', 'extensiones') ? 'extensiones' : 'nombre');
+
+                $table->string('misterplan_api_key')->nullable()->after($afterColumn);
             }
             if (!Schema::hasColumn('establecimientos', 'misterplan_channel_id')) {
-                $table->string('misterplan_channel_id')->nullable()->after('misterplan_api_key');
+                $afterColumn = Schema::hasColumn('establecimientos', 'misterplan_api_key')
+                    ? 'misterplan_api_key'
+                    : (Schema::hasColumn('establecimientos', 'extensiones') ? 'extensiones' : 'nombre');
+
+                $table->string('misterplan_channel_id')->nullable()->after($afterColumn);
             }
         });
     }

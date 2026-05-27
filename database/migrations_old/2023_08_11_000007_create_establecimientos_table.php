@@ -12,7 +12,7 @@ class CreateEstablecimientosTable extends Migration
             $table->bigIncrements('id');
             $table->string('codigo')->unique();
             $table->string('nombre');
-            $table->bigInteger('sociedad_id ')->nullable();  
+            $table->bigInteger('sociedad_id')->nullable();
             $table->integer('remote_hotel_id')->nullable();  
             $table->longText('mensaje_conectado')->nullable();  
             $table->tinyInteger('ocultar_header_totem')->nullable();  
