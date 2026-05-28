@@ -1,13 +1,18 @@
 services:
   mariadb:
     image: docker.io/bitnami/mariadb@sha256:080f43016353de960fbdc733f7f149fae8316382af4c479a4a8adab369861909
+    container_name: sh360-mysql
+    ports:
+      - 3306:3306
     environment:
-      MARIADB_USER: "myuser"
-      MARIADB_PASSWORD: "password"
-      MARIADB_DATABASE: "mydb"
+      MARIADB_USER: "sh360_dev"
+      MARIADB_PASSWORD: "Throng-Predict9-Wobbly"
+      MARIADB_DATABASE: "sh360_dev"
       MARIADB_ROOT_PASSWORD: "secret"
     networks:
-      - sh360-red
+      sh360-red:
+        aliases:
+          - sh360-mysql
 
   app:
     build:
@@ -21,11 +26,11 @@ services:
       - 9000
     environment:
       DB_CONNECTION: mysql
-      DB_HOST: mariadb
+      DB_HOST: sh360-mysql
       DB_PORT: 3306
-      DB_DATABASE: mydb
-      DB_USERNAME: myuser
-      DB_PASSWORD: password
+      DB_DATABASE: sh360_dev
+      DB_USERNAME: sh360_dev
+      DB_PASSWORD: Throng-Predict9-Wobbly
     depends_on:
       - mariadb
     command: >
@@ -61,9 +66,12 @@ services:
       - 50000:50000
     container_name: jenkins
     volumes:
-      - /home/${myname}/jenkins_compose/jenkins_configuration:/var/jenkins_home
+      - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   sh360-red:
     driver: bridge
+
+volumes:
+  jenkins_home:

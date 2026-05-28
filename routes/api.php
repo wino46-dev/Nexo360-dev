@@ -4,6 +4,11 @@ use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', 'App\\Http\\Controllers\\Api\\AuthController@login');
+Route::get('login', function () {
+    return response()->json([
+        'message' => 'Use POST /api/login with email and password.',
+    ], 405)->header('Allow', 'POST');
+});
 Route::get('ping', function () {
     return response()->json([
         'ok' => true,
