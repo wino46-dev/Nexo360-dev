@@ -33,7 +33,10 @@ class ControlSesion extends Component
             return '';
         }
 
-        abort_if(Gate::denies('control_sesion_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        if (Gate::denies('control_sesion_create')) {
+            // Do not block the whole page; just hide this optional widget.
+            return '';
+        }
         $emisors = auth()->user()->id;
 
         $current_user_sesion = ControlSesionModel::where('estado_sesion',1)->where('emisor_id',$emisors)->with(['receptor'])->first();
