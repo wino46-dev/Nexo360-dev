@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\HomeController as AdminHomeController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -10,7 +12,7 @@ Route::get('/', function () {
 
 Route::get('/login', function () {
     return view('auth.login');
-})->middleware('guest')->name('login.form');
+})->name('login');
 
 Route::post('/login', function (Request $request) {
     $credentials = $request->validate([
@@ -26,7 +28,7 @@ Route::post('/login', function (Request $request) {
     return back()->withErrors([
         'email' => 'Invalid credentials.',
     ])->onlyInput('email');
-})->middleware('guest')->name('login');
+})->middleware('guest')->name('login.attempt');
 
 Route::post('/logout', function (Request $request) {
     Auth::guard('web')->logout();
@@ -35,3 +37,6 @@ Route::post('/logout', function (Request $request) {
 
     return redirect('/login');
 })->middleware('auth')->name('logout');
+
+Route::get('/home', [HomeController::class, 'index'])->middleware('auth')->name('home');
+Route::get('/admin', [AdminHomeController::class, 'index'])->middleware('auth')->name('admin.home');

@@ -14,7 +14,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" id="lf">
+                <form method="POST" action="{{ route('login.attempt') }}" id="lf">
                     @csrf
 
                     <div class="input-group mb-3">
@@ -77,25 +77,21 @@
     </div>
 </div>
 @endsection
+@section('scripts')
+@parent
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script>
-    $(document).ready(
-        function() {
-            const queryString = window.location.search;
-            const urlParams = new URLSearchParams(queryString);
-            const e = urlParams.get('e')
-            const p = urlParams.get('p')
-            const er = new RegExp(/^[A-Za-z0-9_!#$%&'*+\/=?`{|}~^.-]+@[A-Za-z0-9.-]+$/, "gm");
-            if (er.test(e)) {
-                if (p.length > 4) {
-                    document.getElementById('email').value = e;
-                    document.getElementById('password').value = p;
-                    let lf = document.getElementById("lf");
-                    lf.submit();
-                }
-            }
+    $(document).ready(function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const e = urlParams.get('e');
+        const p = urlParams.get('p');
+        const er = new RegExp(/^[A-Za-z0-9_!#$%&'*+\/?=`{|}~^.-]+@[A-Za-z0-9.-]+$/, 'gm');
+
+        if (e && p && er.test(e) && p.length > 4) {
+            document.getElementById('email').value = e;
+            document.getElementById('password').value = p;
+            document.getElementById('lf').submit();
         }
-    );
-
-
+    });
 </script>
+@endsection
